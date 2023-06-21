@@ -9,6 +9,7 @@ from email.utils import make_msgid
 import datetime
 import getpass
 
+#getting user email details
 user = input("Enter email id: ")
 password = getpass.getpass()
 smtp_server = 'smtp.gmail.com'
@@ -25,6 +26,7 @@ Regards,
 Gughan R
 '''
 
+#logging in
 imap = IMAP4_SSL('imap.gmail.com')
 imap.login(user, password)
 
@@ -34,6 +36,7 @@ server.ehlo()
 server.starttls()
 server.login(user, password)
 
+#mail construction
 def construct_mail(email):
     mail = MIMEMultipart('alternative')
     mail['Message-ID'] = make_msgid()
@@ -44,6 +47,7 @@ def construct_mail(email):
     mail.attach(MIMEText(body, 'plain'))
     return mail
 
+#sending mail
 def send_reply(mail):
     imap.select(readonly=True)
     _, data = imap.fetch(mail, '(RFC822)')
@@ -53,6 +57,7 @@ def send_reply(mail):
     log = 'Replied to “%s”' % (x['From'])
     print(log)
     imap.select(readonly=False)
+    #mark mail as answered and read
     imap.store(mail_number, '+FLAGS', '\\Answered')
     imap.store(mail_number, '+FLAGS', '\\Seen')
     imap.close()
@@ -70,6 +75,7 @@ while(True):
         # print(threads)
         send_reply(mail_number)
         imap.select()
+        #move the emails to a label
         imap.store(mail_number, '+X-GM-LABELS', '"TEST"')
         imap.copy(mail_number, '"[Gmail]/TEST"')
     interval = random.randint(45, 120)
