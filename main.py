@@ -58,6 +58,7 @@ def send_reply(mail):
     imap.close()
 
 start_date = datetime.datetime(datetime.datetime.now().year, datetime.datetime.now().month, datetime.datetime.now().day)
+print("Auto Responder Starting")
 while(True):
     imap.select(readonly=False)
     _, data = imap.search(None, f'(UNSEEN) SINCE "{start_date.strftime("%d-%b-%Y")}" UNANSWERED')
@@ -65,9 +66,12 @@ while(True):
     for mail_number in data[0].split():
         print(mail_number)
         imap.select()
+        # _, threads = imap.search(None, f'(HEADER "In-Reply-To" "{mail_number}")')
+        # print(threads)
         send_reply(mail_number)
         imap.select()
         imap.store(mail_number, '+X-GM-LABELS', '"TEST"')
         imap.copy(mail_number, '"[Gmail]/TEST"')
     interval = random.randint(45, 120)
+    print("Auto Responder will run again in "+ str(interval)+" seconds")
     time.sleep(interval)
